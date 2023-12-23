@@ -1,0 +1,46 @@
+// Install Prisma and Prisma Client
+// npm i prisma @prisma/client
+
+// Create a new migration file for your database schema changes
+// npx prisma migrate dev --name init --create-only  
+
+// Apply the migrations to update the database schema
+// npx prisma migrate deploy 
+
+// Generate Prisma Client code
+// npx prisma generate
+
+// Format Prisma schema files
+// npx prisma format
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id           String   @id @default(uuid())
+    firstName    String
+    lastName     String
+    age          Int
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    houseOwner   House[]  @relation("houseOwner")
+    houseBuilder House[]  @relation("houseBuilder")
+}
+
+model House {
+    id           String   @id @default(uuid())
+    address      String   @unique
+    wifiPassword String?
+    owner        User     @relation("houseOwner", fields: [ownerId], references: [id])
+    ownerId      String
+    buildBy      User     @relation("houseBuilder", fields: [buildById], references: [id])
+    buildById    String
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+}
